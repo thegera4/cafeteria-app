@@ -14,12 +14,11 @@ interface Product {
 }
 
 export function ProductCard({ product }: { product: Product }) {
-  const addItem = useCartStore((state) => state.addItem)
-  const updateQuantity = useCartStore((state) => state.updateQuantity)
-  const items = useCartStore((state) => state.items)
-  
-  const cartItem = items.find(item => item.id === product._id)
-  const quantityInCart = cartItem?.quantity || 0
+  const addItem = useCartStore((state) => state.addItem);
+  const updateQuantity = useCartStore((state) => state.updateQuantity);
+  const items = useCartStore((state) => state.items);
+  const cartItem = items.find(item => item.id === product._id);
+  const quantityInCart = cartItem?.quantity || 0;
 
   const handleAdd = () => {
     addItem({
@@ -31,13 +30,9 @@ export function ProductCard({ product }: { product: Product }) {
     })
   }
 
-  const handleIncrement = () => {
-    updateQuantity(product._id, quantityInCart + 1)
-  }
+  const handleIncrement = () => updateQuantity(product._id, quantityInCart + 1);
 
-  const handleDecrement = () => {
-    updateQuantity(product._id, quantityInCart - 1)
-  }
+  const handleDecrement = () => updateQuantity(product._id, quantityInCart - 1);
 
   return (
     <div className="bg-surface rounded-xl border border-slate-200 overflow-hidden flex flex-col group transition-colors hover:border-primary-light">

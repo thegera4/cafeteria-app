@@ -1,19 +1,17 @@
 'use client'
 
-import { ShoppingBag, Coffee } from 'lucide-react'
-import { useCartStore } from '@/store/cartStore'
-import { SignInButton, UserButton, useAuth } from '@clerk/nextjs'
-import Link from 'next/link'
-import { CartSidebar } from './CartSidebar'
+import { ShoppingBag, Coffee } from 'lucide-react';
+import { useCartStore } from '@/store/cartStore';
+import { SignInButton, UserButton, useAuth } from '@clerk/nextjs';
+import Link from 'next/link';
+import { CartSidebar } from './CartSidebar';
 
 export function Header() {
-  const items = useCartStore((state) => state.items)
-  const tableNumber = useCartStore((state) => state.tableNumber)
-  const setIsOpen = useCartStore((state) => state.setIsOpen)
-  const { isLoaded, isSignedIn } = useAuth()
-
-  
-  const totalItems = items.reduce((acc, item) => acc + item.quantity, 0)
+  const { isLoaded, isSignedIn } = useAuth();
+  const items = useCartStore((state) => state.items);
+  const tableNumber = useCartStore((state) => state.tableNumber);
+  const setIsOpen = useCartStore((state) => state.setIsOpen);
+  const totalItems = items.reduce((acc, item) => acc + item.quantity, 0);
 
   return (
     <>
@@ -23,19 +21,16 @@ export function Header() {
             <Coffee className="w-6 h-6" />
             <span>Cafeteria</span>
           </Link>
-
           <nav className="hidden md:flex items-center gap-8 font-semibold text-sm text-foreground/80">
             <Link href="/" className="hover:text-primary transition-colors">Menu</Link>
             <Link href="/rewards" className="hover:text-primary transition-colors">Rewards</Link>
           </nav>
-          
           <div className="flex items-center gap-6">
             {tableNumber && (
               <div className="hidden sm:flex items-center gap-2 bg-primary-light/20 text-primary-container px-3 py-1 rounded-full text-sm font-semibold">
                 Table {tableNumber}
               </div>
             )}
-            
             <div className="flex items-center gap-4">
               {isLoaded && !isSignedIn && (
                 <SignInButton mode="modal">
@@ -44,14 +39,11 @@ export function Header() {
                   </button>
                 </SignInButton>
               )}
-              {isLoaded && isSignedIn && (
-                <UserButton />
-              )}
+              {isLoaded && isSignedIn && (<UserButton />)}
             </div>
           </div>
         </div>
       </header>
-
       {totalItems > 0 && (
         <button 
           onClick={() => setIsOpen(true)}
@@ -66,7 +58,6 @@ export function Header() {
           <span className="text-lg tracking-wide">Order Now</span>
         </button>
       )}
-
       <CartSidebar />
     </>
   )

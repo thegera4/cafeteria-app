@@ -43,9 +43,7 @@ export function CartSidebar() {
         {/* Cart Items */}
         <div className="flex-1 overflow-y-auto p-6 space-y-4">
           {items.length === 0 ? (
-            <div className="text-center text-gray-500 py-10">
-              Your bag is empty.
-            </div>
+            <div className="text-center text-gray-500 py-10">Your bag is empty.</div>
           ) : (
             items.map((item) => (
               <div key={item.id} className="flex gap-4 p-4 bg-surface rounded-xl border border-slate-200 shadow-sm">
@@ -101,7 +99,6 @@ export function CartSidebar() {
               <span className="text-lg font-bold text-gray-900">Grand Total</span>
               <span className="text-2xl font-bold text-primary">${getCartTotal().toFixed(2)}</span>
             </div>
-            
             <div className="grid grid-cols-2 gap-4">
               <button className="w-full py-4 rounded-xl font-bold text-primary border-2 border-primary hover:bg-primary-light/10 transition-colors">
                 Pay at the End
