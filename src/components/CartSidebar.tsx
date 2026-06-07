@@ -33,7 +33,7 @@ export function CartSidebar() {
         className={`fixed inset-0 bg-black/50 z-[100] backdrop-blur-sm transition-opacity duration-300 ${isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
         onClick={() => setIsOpen(false)}
       />
-      <div className={`fixed top-0 right-0 h-full w-full sm:w-[450px] bg-background shadow-2xl z-[101] flex flex-col transition-transform duration-300 ease-in-out ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}>
+      <div className={`fixed top-0 right-0 h-full w-full sm:w-[450px] bg-background shadow-2xl z-[101] flex flex-col transition-transform duration-300 ease-in-out ${isOpen ? 'translate-x-0 pointer-events-auto' : 'translate-x-full pointer-events-none'}`}>
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-slate-200">
           <h2 className="text-2xl font-bold text-primary">Your Order</h2>

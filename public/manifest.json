@@ -1,0 +1,17 @@
+{
+  "name": "Cafeteria App",
+  "short_name": "Cafeteria",
+  "description": "Order coffee and food right from your table.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#14532d",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

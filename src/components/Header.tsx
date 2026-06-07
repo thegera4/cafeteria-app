@@ -24,9 +24,33 @@ export function Header() {
             <Coffee className="w-6 h-6" />
             <span>Cafeteria</span>
           </Link>
-          <nav className="hidden md:flex items-center gap-8 font-semibold text-sm text-foreground/80">
-            <Link href="/" className="hover:text-primary transition-colors">Menu</Link>
-            <Link href="/rewards" className="hover:text-primary transition-colors">Rewards</Link>
+          <nav className="hidden md:flex items-center gap-8 font-semibold text-sm">
+            <Link 
+              href="/" 
+              className={`relative py-1 transition-colors ${
+                pathname === '/' 
+                  ? 'text-primary font-bold' 
+                  : 'text-gray-500 hover:text-primary'
+              }`}
+            >
+              Menu
+              <span className={`absolute bottom-[-4px] left-0 right-0 h-[2px] bg-primary rounded-full transition-all duration-300 origin-left ${
+                pathname === '/' ? 'scale-x-100 opacity-100' : 'scale-x-0 opacity-0'
+              }`} />
+            </Link>
+            <Link 
+              href="/rewards" 
+              className={`relative py-1 transition-colors ${
+                pathname === '/rewards' 
+                  ? 'text-primary font-bold' 
+                  : 'text-gray-500 hover:text-primary'
+              }`}
+            >
+              Rewards
+              <span className={`absolute bottom-[-4px] left-0 right-0 h-[2px] bg-primary rounded-full transition-all duration-300 origin-left ${
+                pathname === '/rewards' ? 'scale-x-100 opacity-100' : 'scale-x-0 opacity-0'
+              }`} />
+            </Link>
           </nav>
           <div className="flex items-center gap-6">
             {tableNumber && (

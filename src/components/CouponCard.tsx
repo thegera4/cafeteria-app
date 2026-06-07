@@ -1,6 +1,5 @@
 'use client'
 
-import { useState } from 'react'
 import { useCartStore } from '@/store/cartStore'
 import { TicketPercent, Clock, CheckCircle, XCircle } from 'lucide-react'
 
@@ -9,7 +8,6 @@ export function CouponCard({ coupon }: { coupon: any }) {
   const removeCoupon = useCartStore(state => state.removeCoupon)
   const appliedCoupon = useCartStore(state => state.appliedCoupon)
   const setIsOpen = useCartStore(state => state.setIsOpen)
-  const [isHovered, setIsHovered] = useState(false)
   
   const isApplied = appliedCoupon?.id === coupon._id
   
@@ -41,8 +39,16 @@ export function CouponCard({ coupon }: { coupon: any }) {
       
       <div className="relative p-6 flex flex-col h-full">
         <div className="flex justify-between items-start mb-4">
-          <div className="bg-primary/10 text-primary p-3 rounded-xl">
-            <TicketPercent className="w-8 h-8" />
+          <div className="flex items-center gap-3">
+            <div className="bg-primary/10 text-primary p-3 rounded-xl">
+              <TicketPercent className="w-8 h-8" />
+            </div>
+            {isApplied && (
+              <span className="bg-green-100 text-green-800 text-xs font-extrabold px-3 py-1 rounded-full flex items-center border border-green-200 shadow-sm animate-pulse">
+                <CheckCircle className="w-3.5 h-3.5 mr-1 text-green-600" />
+                APPLIED
+              </span>
+            )}
           </div>
           <div className="text-right">
             <div className="text-2xl font-black text-gray-900">
@@ -64,28 +70,17 @@ export function CouponCard({ coupon }: { coupon: any }) {
         
         <button
           onClick={handleApplyToggle}
-          onMouseEnter={() => setIsHovered(true)}
-          onMouseLeave={() => setIsHovered(false)}
           className={`w-full py-3 rounded-xl font-bold text-lg flex items-center justify-center transition-all ${
             isApplied 
-            ? 'bg-green-50 text-green-700 border border-green-200 hover:bg-red-50 hover:text-red-700 hover:border-red-200' 
+            ? 'bg-red-50 text-red-700 border-2 border-red-200 hover:bg-red-100' 
             : 'bg-primary text-white shadow-md hover:bg-primary/90 hover:shadow-lg'
           }`}
         >
           {isApplied ? (
-            isHovered ? (
-              <>
-                <XCircle className="w-5 h-5 mr-2 animate-pulse" />
-                Remove Coupon
-              </>
-            ) : (
-              <>
-                <CheckCircle className="w-5 h-5 mr-2" />
-                <span>Applied</span>
-                <span className="mx-2 text-green-300 font-light">•</span>
-                <span className="text-sm font-semibold underline decoration-dotted decoration-green-500">Remove</span>
-              </>
-            )
+            <>
+              <XCircle className="w-5 h-5 mr-2" />
+              Remove Coupon
+            </>
           ) : (
             'Apply to Order'
           )}
