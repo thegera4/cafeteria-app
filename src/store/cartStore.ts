@@ -8,6 +8,13 @@ export interface CartItem {
   image?: any
 }
 
+export interface AppliedCoupon {
+  id: string
+  code: string
+  discountType: 'percentage' | 'fixed'
+  discountValue: number
+}
+
 interface CartStore {
   items: CartItem[]
   tableNumber: string | null
@@ -19,6 +26,9 @@ interface CartStore {
   updateQuantity: (id: string, quantity: number) => void
   clearCart: () => void
   getCartTotal: () => number
+  appliedCoupon: AppliedCoupon | null
+  applyCoupon: (coupon: AppliedCoupon) => void
+  removeCoupon: () => void
 }
 
 export const useCartStore = create<CartStore>((set, get) => ({
@@ -43,6 +53,18 @@ export const useCartStore = create<CartStore>((set, get) => ({
       items: state.items.map(i => i.id === id ? { ...i, quantity } : i)
     }
   }),
-  clearCart: () => set({ items: [] }),
-  getCartTotal: () => get().items.reduce((total, item) => total + (item.price * item.quantity), 0),
+  clearCart: () => set({ items: [], appliedCoupon: null }),
+  getCartTotal: () => {
+    const subtotal = get().items.reduce((total, item) => total + (item.price * item.quantity), 0);
+    const coupon = get().appliedCoupon;
+    if (!coupon) return subtotal;
+    if (coupon.discountType === 'percentage') {
+      return Math.max(0, subtotal - (subtotal * (coupon.discountValue / 100)));
+    } else {
+      return Math.max(0, subtotal - coupon.discountValue);
+    }
+  },
+  appliedCoupon: null,
+  applyCoupon: (coupon) => set({ appliedCoupon: coupon }),
+  removeCoupon: () => set({ appliedCoupon: null }),
 }))

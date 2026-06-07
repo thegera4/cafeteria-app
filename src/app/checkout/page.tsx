@@ -7,9 +7,10 @@ import { MercadoPagoWrapper } from '@/components/MercadoPagoWrapper'
 import { MPPaymentBrick } from '@/components/MPPaymentBrick'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@clerk/nextjs'
+import { X } from 'lucide-react'
 
 export default function CheckoutPage() {
-  const { items, tableNumber, getCartTotal, clearCart } = useCartStore()
+  const { items, tableNumber, getCartTotal, clearCart, appliedCoupon, removeCoupon } = useCartStore()
   const { userId } = useAuth()
   const router = useRouter()
   const [paymentMode, setPaymentMode] = useState<'app' | 'later' | null>(null)
@@ -18,6 +19,7 @@ export default function CheckoutPage() {
   const [error, setError] = useState<string | null>(null)
 
   const total = getCartTotal()
+  const subtotal = items.reduce((sum, item) => sum + (item.price * item.quantity), 0)
 
   if (orderConfirmed) {
     return (
@@ -65,7 +67,8 @@ export default function CheckoutPage() {
           items,
           totalAmount: total,
           tableNumber,
-          userId
+          userId,
+          appliedCouponId: appliedCoupon?.id
         })
       })
       if (!res.ok) throw new Error('Failed to create order')
@@ -103,6 +106,21 @@ export default function CheckoutPage() {
                 </div>
               ))}
             </div>
+            {appliedCoupon && (
+              <div className="border-t pt-4 flex justify-between items-center text-lg text-green-600 font-bold">
+                <div className="flex items-center gap-2">
+                  <span>Discount ({appliedCoupon.code})</span>
+                  <button
+                    onClick={removeCoupon}
+                    className="p-0.5 text-green-600 hover:text-red-500 hover:bg-red-50 rounded-full transition-colors"
+                    title="Remove coupon"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+                <span>-${(subtotal - total).toFixed(2)}</span>
+              </div>
+            )}
             <div className="border-t pt-4 flex justify-between items-center text-xl font-bold">
               <span>Total</span>
               <span className="text-primary">${total.toFixed(2)}</span>
@@ -124,13 +142,13 @@ export default function CheckoutPage() {
                     onClick={() => setPaymentMode('app')}
                     className="bg-surface border-2 border-primary text-primary p-4 rounded-lg font-bold hover:bg-primary-light/10 transition-colors"
                   >
-                    Pay Now in App
+                    Pay Now
                   </button>
                   <button 
                     onClick={() => setPaymentMode('later')}
                     className="bg-primary-container text-white p-4 rounded-lg font-bold hover:bg-primary transition-colors"
                   >
-                    Pay Later at Counter
+                    Pay Later
                   </button>
                 </div>
               </>

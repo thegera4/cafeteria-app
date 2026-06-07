@@ -3,6 +3,7 @@
 import { X, Plus, Minus, Trash2 } from 'lucide-react'
 import { useCartStore } from '@/store/cartStore'
 import { useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 
 export function CartSidebar() {
   const isOpen = useCartStore((state) => state.isOpen)
@@ -11,7 +12,11 @@ export function CartSidebar() {
   const updateQuantity = useCartStore((state) => state.updateQuantity)
   const removeItem = useCartStore((state) => state.removeItem)
   const getCartTotal = useCartStore((state) => state.getCartTotal)
+  const appliedCoupon = useCartStore((state) => state.appliedCoupon)
+  const removeCoupon = useCartStore((state) => state.removeCoupon)
+  const router = useRouter()
   
+  const subtotal = items.reduce((total, item) => total + (item.price * item.quantity), 0);
   // Prevent body scroll when open
   useEffect(() => {
     if (isOpen) {
@@ -95,16 +100,37 @@ export function CartSidebar() {
         {/* Footer */}
         {items.length > 0 && (
           <div className="p-6 border-t border-slate-200 bg-surface mt-auto">
+            <div className="flex items-center justify-between mb-2 text-gray-600">
+              <span className="text-md font-medium">Subtotal</span>
+              <span className="text-lg font-medium">${subtotal.toFixed(2)}</span>
+            </div>
+            {appliedCoupon && (
+              <div className="flex items-center justify-between mb-2 text-green-600">
+                <div className="flex items-center gap-2">
+                  <span className="text-md font-bold">Discount ({appliedCoupon.code})</span>
+                  <button
+                    onClick={removeCoupon}
+                    className="p-0.5 text-green-600 hover:text-red-500 hover:bg-red-50 rounded-full transition-colors"
+                    title="Remove coupon"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+                <span className="text-lg font-bold">
+                  -${(subtotal - getCartTotal()).toFixed(2)}
+                </span>
+              </div>
+            )}
             <div className="flex items-center justify-between mb-6">
               <span className="text-lg font-bold text-gray-900">Grand Total</span>
               <span className="text-2xl font-bold text-primary">${getCartTotal().toFixed(2)}</span>
             </div>
-            <div className="grid grid-cols-2 gap-4">
-              <button className="w-full py-4 rounded-xl font-bold text-primary border-2 border-primary hover:bg-primary-light/10 transition-colors">
-                Pay at the End
-              </button>
-              <button className="w-full py-4 rounded-xl font-bold text-white bg-primary hover:bg-primary/90 transition-colors shadow-lg">
-                Pay Now
+            <div className="grid grid-cols-1 gap-4">
+              <button 
+                onClick={() => { setIsOpen(false); router.push('/checkout'); }}
+                className="w-full py-4 rounded-xl font-bold text-white bg-primary hover:bg-primary/90 transition-colors shadow-lg"
+              >
+                Go to Checkout
               </button>
             </div>
           </div>

@@ -4,6 +4,7 @@ import { ShoppingBag, Coffee } from 'lucide-react';
 import { useCartStore } from '@/store/cartStore';
 import { SignInButton, UserButton, useAuth } from '@clerk/nextjs';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { CartSidebar } from './CartSidebar';
 
 export function Header() {
@@ -11,7 +12,9 @@ export function Header() {
   const items = useCartStore((state) => state.items);
   const tableNumber = useCartStore((state) => state.tableNumber);
   const setIsOpen = useCartStore((state) => state.setIsOpen);
+  const pathname = usePathname();
   const totalItems = items.reduce((acc, item) => acc + item.quantity, 0);
+  const hideCartFab = pathname === '/checkout';
 
   return (
     <>
@@ -44,7 +47,7 @@ export function Header() {
           </div>
         </div>
       </header>
-      {totalItems > 0 && (
+      {totalItems > 0 && !hideCartFab && (
         <button 
           onClick={() => setIsOpen(true)}
           className="fixed bottom-6 right-6 z-50 flex items-center gap-3 bg-primary text-white px-6 py-4 rounded-full shadow-2xl hover:shadow-primary/50 hover:scale-105 active:scale-95 transition-all duration-300 font-bold group cursor-pointer"

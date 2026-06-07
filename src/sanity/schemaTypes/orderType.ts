@@ -98,6 +98,13 @@ export const orderType = defineType({
       type: 'string',
       description: 'Optional: If the customer was logged in.',
     }),
+    defineField({
+      name: 'appliedCoupon',
+      title: 'Applied Coupon',
+      type: 'reference',
+      to: [{ type: 'coupon' }],
+      description: 'The coupon that was applied to this order.',
+    }),
   ],
   preview: {
     select: {
