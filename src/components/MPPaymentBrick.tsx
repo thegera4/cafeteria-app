@@ -2,8 +2,7 @@
 
 import { Payment } from '@mercadopago/sdk-react'
 import { useCartStore } from '@/store/cartStore'
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, useMemo, useCallback } from 'react'
 
 export function MPPaymentBrick({ onPaymentSuccess }: { onPaymentSuccess: (id: string) => void }) {
   const [error, setError] = useState<string | null>(null)
@@ -11,11 +10,19 @@ export function MPPaymentBrick({ onPaymentSuccess }: { onPaymentSuccess: (id: st
   const items = useCartStore((state) => state.items)
   const total = getCartTotal()
   
-  const initialization = {
+  const initialization = useMemo(() => ({
     amount: total,
-  }
+  }), [total])
 
-  const onSubmit = async ({ selectedPaymentMethod, formData }: any) => {
+  const customization = useMemo(() => ({
+    paymentMethods: {
+      creditCard: 'all' as const,
+      debitCard: 'all' as const,
+      mercadoPago: 'all' as const,
+    },
+  }), [])
+
+  const onSubmit = useCallback(async ({ selectedPaymentMethod, formData }: any) => {
     try {
       const response = await fetch('/api/process-payment', {
         method: 'POST',
@@ -33,28 +40,22 @@ export function MPPaymentBrick({ onPaymentSuccess }: { onPaymentSuccess: (id: st
     } catch (err) {
       setError('An unexpected error occurred')
     }
-  }
+  }, [items, onPaymentSuccess])
 
-  const onError = async (error: any) => {
+  const onError = useCallback(async (error: any) => {
     console.error(error)
-  }
+  }, [])
 
-  const onReady = async () => {
+  const onReady = useCallback(async () => {
     // Brick is ready
-  }
+  }, [])
 
   return (
     <div className="w-full">
       {error && <div className="text-red-500 mb-4 font-medium">{error}</div>}
       <Payment
         initialization={initialization}
-        customization={{
-          paymentMethods: {
-            creditCard: 'all',
-            debitCard: 'all',
-            mercadoPago: 'all',
-          },
-        }}
+        customization={customization}
         onSubmit={onSubmit}
         onReady={onReady}
         onError={onError}
