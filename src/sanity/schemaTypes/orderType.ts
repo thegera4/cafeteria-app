@@ -110,7 +110,6 @@ export const orderType = defineType({
     select: {
       title: 'tableNumber',
       subtitle: 'orderStatus',
-      media: '',
     },
     prepare({ title, subtitle }) {
       return {
