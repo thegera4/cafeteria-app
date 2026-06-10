@@ -18,7 +18,6 @@ export function MPPaymentBrick({ onPaymentSuccess }: { onPaymentSuccess: (id: st
     paymentMethods: {
       creditCard: 'all' as const,
       debitCard: 'all' as const,
-      mercadoPago: 'all' as const,
     },
   }), [])
 
