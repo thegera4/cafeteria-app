@@ -11,6 +11,7 @@ export function MPPaymentBrick({ onPaymentSuccess }: { onPaymentSuccess: (id: st
   const tableNumber = useCartStore((state) => state.tableNumber)
   const getCartTotal = useCartStore((state) => state.getCartTotal)
   const items = useCartStore((state) => state.items)
+  const appliedCoupon = useCartStore((state) => state.appliedCoupon)
   const total = Number(getCartTotal().toFixed(2))
   
   const initialization = useMemo(() => ({
@@ -36,7 +37,8 @@ export function MPPaymentBrick({ onPaymentSuccess }: { onPaymentSuccess: (id: st
           transaction_amount: total, 
           items, 
           tableNumber, 
-          userId 
+          userId,
+          appliedCouponId: appliedCoupon?.id
         }),
       })
       const data = await response.json()
@@ -48,7 +50,7 @@ export function MPPaymentBrick({ onPaymentSuccess }: { onPaymentSuccess: (id: st
     } catch (err) {
       setError('An unexpected error occurred')
     }
-  }, [items, onPaymentSuccess, tableNumber, userId])
+  }, [items, onPaymentSuccess, tableNumber, userId, appliedCoupon])
 
   // Keep a stable reference of onSubmit using a Ref to prevent Brick re-initialization
   const onSubmitRef = useRef(onSubmit)

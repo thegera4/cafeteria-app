@@ -5,10 +5,31 @@ import { client } from '@/sanity/lib/client'
 export async function POST(request: Request) {
   try {
     const body = await request.json()
-    const { transaction_amount, token, description, installments, payment_method_id, issuer_id, payer, items, tableNumber, userId } = body
+    const { transaction_amount, token, description, installments, payment_method_id, issuer_id, payer, items, tableNumber, userId, appliedCouponId } = body
 
     if (!process.env.MERCADOPAGO_ACCESS_TOKEN) {
       throw new Error('Mercado Pago Access Token is missing')
+    }
+
+    let couponRef = undefined;
+    if (appliedCouponId) {
+      const coupon = await client.fetch(`*[_type == "coupon" && _id == $id][0]`, { id: appliedCouponId });
+      if (!coupon || !coupon.isActive) {
+        throw new Error("Invalid or inactive coupon.");
+      }
+      if (userId) {
+        const existingOrder = await client.fetch(
+          `*[_type == "order" && userId == $userId && appliedCoupon._ref == $id][0]`,
+          { userId, id: appliedCouponId }
+        );
+        if (existingOrder) {
+          throw new Error("You have already used this coupon.");
+        }
+      }
+      couponRef = {
+        _type: 'reference',
+        _ref: appliedCouponId
+      };
     }
 
     const mpClient = new MercadoPagoConfig({ accessToken: process.env.MERCADOPAGO_ACCESS_TOKEN })
@@ -39,6 +60,7 @@ export async function POST(request: Request) {
         orderStatus: 'received',
         mercadoPagoPaymentId: paymentResponse.id?.toString(),
         userId: userId || null,
+        appliedCoupon: couponRef,
         items: items.map((item: any) => ({
           _key: crypto.randomUUID(),
           product: {
