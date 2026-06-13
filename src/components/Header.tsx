@@ -20,13 +20,13 @@ export function Header() {
     <>
       <header className="sticky top-0 z-50 w-full border-b bg-white/80 backdrop-blur-md">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2 text-xl font-bold text-primary">
+          <Link href={tableNumber ? `/?table=${tableNumber}` : "/"} className="flex items-center gap-2 text-xl font-bold text-primary">
             <Coffee className="w-6 h-6" />
             <span>Cafeteria</span>
           </Link>
           <nav className="hidden md:flex items-center gap-8 font-semibold text-sm">
             <Link 
-              href="/" 
+              href={tableNumber ? `/?table=${tableNumber}` : "/"} 
               className={`relative py-1 transition-colors ${
                 pathname === '/' 
                   ? 'text-primary font-bold' 
@@ -39,7 +39,7 @@ export function Header() {
               }`} />
             </Link>
             <Link 
-              href="/rewards" 
+              href={tableNumber ? `/rewards?table=${tableNumber}` : "/rewards"} 
               className={`relative py-1 transition-colors ${
                 pathname === '/rewards' 
                   ? 'text-primary font-bold' 

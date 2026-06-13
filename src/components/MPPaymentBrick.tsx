@@ -2,13 +2,16 @@
 
 import { Payment } from '@mercadopago/sdk-react'
 import { useCartStore } from '@/store/cartStore'
-import { useState, useMemo, useCallback } from 'react'
+import { useState, useMemo, useCallback, useRef } from 'react'
+import { useAuth } from '@clerk/nextjs'
 
 export function MPPaymentBrick({ onPaymentSuccess }: { onPaymentSuccess: (id: string) => void }) {
   const [error, setError] = useState<string | null>(null)
+  const { userId } = useAuth()
+  const tableNumber = useCartStore((state) => state.tableNumber)
   const getCartTotal = useCartStore((state) => state.getCartTotal)
   const items = useCartStore((state) => state.items)
-  const total = getCartTotal()
+  const total = Number(getCartTotal().toFixed(2))
   
   const initialization = useMemo(() => ({
     amount: total,
@@ -28,7 +31,13 @@ export function MPPaymentBrick({ onPaymentSuccess }: { onPaymentSuccess: (id: st
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ ...formData, items }),
+        body: JSON.stringify({ 
+          ...formData, 
+          transaction_amount: total, 
+          items, 
+          tableNumber, 
+          userId 
+        }),
       })
       const data = await response.json()
       if (response.ok) {
@@ -39,7 +48,15 @@ export function MPPaymentBrick({ onPaymentSuccess }: { onPaymentSuccess: (id: st
     } catch (err) {
       setError('An unexpected error occurred')
     }
-  }, [items, onPaymentSuccess])
+  }, [items, onPaymentSuccess, tableNumber, userId])
+
+  // Keep a stable reference of onSubmit using a Ref to prevent Brick re-initialization
+  const onSubmitRef = useRef(onSubmit)
+  onSubmitRef.current = onSubmit
+
+  const stableOnSubmit = useCallback(async (param: any) => {
+    return onSubmitRef.current(param)
+  }, [])
 
   const onError = useCallback(async (error: any) => {
     console.error(error)
@@ -55,7 +72,7 @@ export function MPPaymentBrick({ onPaymentSuccess }: { onPaymentSuccess: (id: st
       <Payment
         initialization={initialization}
         customization={customization}
-        onSubmit={onSubmit}
+        onSubmit={stableOnSubmit}
         onReady={onReady}
         onError={onError}
       />

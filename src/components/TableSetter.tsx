@@ -12,6 +12,20 @@ function TableSetterInner() {
     const table = searchParams.get('table')
     if (table) {
       setTableNumber(table)
+      try {
+        localStorage.setItem('tableNumber', table)
+      } catch (e) {
+        console.error('Failed to save table number to localStorage:', e)
+      }
+    } else {
+      try {
+        const savedTable = localStorage.getItem('tableNumber')
+        if (savedTable) {
+          setTableNumber(savedTable)
+        }
+      } catch (e) {
+        console.error('Failed to read table number from localStorage:', e)
+      }
     }
   }, [searchParams, setTableNumber])
 

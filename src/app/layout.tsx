@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { ClerkProvider } from '@clerk/nextjs'
 import { PWARegister } from "@/components/PWARegister";
+import { TableSetter } from "@/components/TableSetter";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -42,6 +43,7 @@ export default function RootLayout({
       >
         <body className="min-h-full flex flex-col">
           <PWARegister />
+          <TableSetter />
           {children}
         </body>
       </html>

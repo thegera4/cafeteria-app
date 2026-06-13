@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useCartStore } from '@/store/cartStore'
 import { Header } from '@/components/Header'
 import { MercadoPagoWrapper } from '@/components/MercadoPagoWrapper'
@@ -17,46 +17,36 @@ export default function CheckoutPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [orderConfirmed, setOrderConfirmed] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [countdown, setCountdown] = useState(10)
 
-  const total = getCartTotal()
+  // Countdown timer effect
+  useEffect(() => {
+    if (!orderConfirmed) return
+
+    const interval = setInterval(() => {
+      setCountdown((prev) => prev - 1)
+    }, 1000)
+
+    return () => clearInterval(interval)
+  }, [orderConfirmed])
+
+  // Redirect effect (runs outside the state updater function to avoid React render errors)
+  useEffect(() => {
+    if (orderConfirmed && countdown <= 0) {
+      router.push(tableNumber ? `/?table=${tableNumber}` : '/')
+    }
+  }, [countdown, orderConfirmed, router, tableNumber])
+
+  // Ensure total is a valid number rounded to 2 decimal places to satisfy payment APIs (especially with coupon discounts)
+  const total = Number(getCartTotal().toFixed(2))
   const subtotal = items.reduce((sum, item) => sum + (item.price * item.quantity), 0)
 
-  if (orderConfirmed) {
-    return (
-      <div className="min-h-screen bg-background">
-        <Header />
-        <div className="container mx-auto px-4 py-16 text-center">
-          <div className="w-24 h-24 bg-primary-light/20 text-primary-container rounded-full flex items-center justify-center mx-auto mb-6 text-4xl">
-            ✓
-          </div>
-          <h1 className="text-3xl font-bold mb-4">Order Confirmed!</h1>
-          <p className="text-gray-600 mb-8">Thank you for your order. We are preparing it now.</p>
-          <button 
-            onClick={() => router.push('/')}
-            className="bg-primary text-white px-8 py-3 rounded-lg font-bold hover:bg-primary-container transition-colors"
-          >
-            Back to Menu
-          </button>
-        </div>
-      </div>
-    )
-  }
+  const handlePaymentSuccess = useCallback((id: string) => {
+    clearCart()
+    setOrderConfirmed(true)
+  }, [clearCart])
 
-  if (items.length === 0) {
-    return (
-      <div className="min-h-screen bg-background">
-        <Header />
-        <div className="container mx-auto px-4 py-16 text-center">
-          <h1 className="text-2xl font-bold mb-4">Your Cart is Empty</h1>
-          <button onClick={() => router.push('/')} className="text-primary hover:underline">
-            Go back to the menu
-          </button>
-        </div>
-      </div>
-    )
-  }
-
-  const handlePayLater = async () => {
+  const handlePayLater = useCallback(async () => {
     setIsSubmitting(true)
     setError(null)
     try {
@@ -79,11 +69,47 @@ export default function CheckoutPage() {
     } finally {
       setIsSubmitting(false)
     }
+  }, [items, total, tableNumber, userId, appliedCoupon, clearCart])
+
+  if (orderConfirmed) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header />
+        <div className="container mx-auto px-4 py-16 text-center">
+          <div className="w-24 h-24 bg-primary-light/20 text-primary-container rounded-full flex items-center justify-center mx-auto mb-6 text-4xl">
+            ✓
+          </div>
+          <h1 className="text-3xl font-bold mb-4">Order Confirmed!</h1>
+          <p className="text-gray-600 mb-2">Thank you for your order. We are preparing it now.</p>
+          <p className="text-sm text-gray-500 mb-8 font-medium">
+            Redirecting to the menu in <span className="font-semibold text-primary">{countdown}</span> seconds...
+          </p>
+          <button 
+            onClick={() => router.push(tableNumber ? `/?table=${tableNumber}` : '/')}
+            className="bg-primary text-white px-8 py-3 rounded-lg font-bold hover:bg-primary-container transition-colors"
+          >
+            Back to Menu
+          </button>
+        </div>
+      </div>
+    )
   }
 
-  const handlePaymentSuccess = (id: string) => {
-    clearCart()
-    setOrderConfirmed(true)
+  if (items.length === 0) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header />
+        <div className="container mx-auto px-4 py-16 text-center">
+          <h1 className="text-2xl font-bold mb-4">Your Cart is Empty</h1>
+          <button 
+            onClick={() => router.push(tableNumber ? `/?table=${tableNumber}` : '/')} 
+            className="text-primary hover:underline"
+          >
+            Go back to the menu
+          </button>
+        </div>
+      </div>
+    )
   }
 
   return (

@@ -1,9 +1,10 @@
 {
   "name": "cafeteria-app",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "scripts": {
     "dev": "next dev --webpack",
+    "dev:share": "next dev --webpack -H 0.0.0.0",
     "build": "next build",
     "start": "next start",
     "lint": "eslint"

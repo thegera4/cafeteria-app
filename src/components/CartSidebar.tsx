@@ -14,6 +14,7 @@ export function CartSidebar() {
   const getCartTotal = useCartStore((state) => state.getCartTotal)
   const appliedCoupon = useCartStore((state) => state.appliedCoupon)
   const removeCoupon = useCartStore((state) => state.removeCoupon)
+  const tableNumber = useCartStore((state) => state.tableNumber)
   const router = useRouter()
   
   const subtotal = items.reduce((total, item) => total + (item.price * item.quantity), 0);
@@ -127,7 +128,7 @@ export function CartSidebar() {
             </div>
             <div className="grid grid-cols-1 gap-4">
               <button 
-                onClick={() => { setIsOpen(false); router.push('/checkout'); }}
+                onClick={() => { setIsOpen(false); router.push(tableNumber ? `/checkout?table=${tableNumber}` : '/checkout'); }}
                 className="w-full py-4 rounded-xl font-bold text-white bg-primary hover:bg-primary/90 transition-colors shadow-lg"
               >
                 Go to Checkout

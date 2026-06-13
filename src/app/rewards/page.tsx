@@ -7,9 +7,17 @@ import { CartSidebar } from '@/components/CartSidebar'
 
 export const dynamic = 'force-dynamic'
 
-export default async function RewardsPage() {
+export default async function RewardsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ table?: string }>
+}) {
   const user = await currentUser()
-  if (!user) { redirect('/?sign-in=true') }
+  const { table } = await searchParams
+
+  if (!user) {
+    redirect(table ? `/?sign-in=true&table=${table}` : '/?sign-in=true')
+  }
 
   const query = `
     *[_type == "coupon" && isActive == true && validFrom <= now() && validUntil >= now() && !(_id in *[_type == "order" && userId == $userId && defined(appliedCoupon)].appliedCoupon._ref)] {

@@ -2,7 +2,6 @@ import { getCategoriesQuery, getAllProductsQuery } from '@/sanity/lib/queries'
 import { sanityFetch, SanityLive } from '@/sanity/lib/live'
 import { MenuClient } from '@/components/MenuClient'
 import { Header } from '@/components/Header'
-import { TableSetter } from '@/components/TableSetter'
 import { HeroCarousel } from '@/components/HeroCarousel'
 import { SignInTrigger } from '@/components/SignInTrigger'
 import { Suspense } from 'react'
@@ -19,7 +18,6 @@ export default async function Page() {
       <Suspense fallback={null}>
         <SignInTrigger />
       </Suspense>
-      <TableSetter />
       <Header />
       <div className="container mx-auto px-4 py-8">
         <HeroCarousel />
